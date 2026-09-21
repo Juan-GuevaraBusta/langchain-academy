@@ -50,10 +50,23 @@ from models import model
 #       ...
 # ════════════════════════════════════════════════════════════════════════
 
+
+F1_CHAMPIONS = {
+  "2025": "Max Verstappen",
+  "2024": "Lewis Hamilton",
+  "2023": "Charles Leclerc",
+  "2022": "Fernando Alonso",
+  "2021": "Max Verstappen",
+}
+
 @tool
 def your_custom_tool(query: str) -> str:
     """TODO 1: replace this docstring and body with your own tool."""
     raise NotImplementedError("TODO 1: see the comment block above")
+    key = query.strip().lowe()
+    if key in F1_CHAMPIONS:
+      return F1_CHAMPIONS(key)
+    return f"No F1 champions found for {key}. Known years: {', '.join(F1_CHAMPIONS.keys())}"
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -65,14 +78,13 @@ def your_custom_tool(query: str) -> str:
 # read_sql.
 # ════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PROMPT = """TODO 2: replace this with your own system prompt."""
+SYSTEM_PROMPT = """
+You are a F1 expert who knows the champions of every year.
+You are to answer questions about the F1 champions of the year and only the years
+that you know about. If you don't know the answer, you should return the normal function response.
+Any other subject asked about should be answered with a simple "I dont know about that"
+"""
 
-# Guards against running with an unfilled placeholder; the filled
-# reference doesn't need this since there's no placeholder text left.
-if "TODO 1" in your_custom_tool.description:
-    raise NotImplementedError("TODO 1: see the comment block above")
-if "TODO 2" in SYSTEM_PROMPT:
-    raise NotImplementedError("TODO 2: see the comment block above")
 
 agent = create_deep_agent(
     model=model,
