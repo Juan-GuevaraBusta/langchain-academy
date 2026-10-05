@@ -10,6 +10,9 @@ load_dotenv()
 
 client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# The agents must query with this same model, or similarity scores are meaningless
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+
 DOCS_DIR = "./documents"
 EMBEDDINGS_DIR = "./embeddings"
 
@@ -31,7 +34,7 @@ async def generate_embeddings():
     embeddings = []
     for filename, content in docs:
         response = await client.embeddings.create(
-            model="text-embedding-3-small",
+            model=EMBEDDING_MODEL,
             input=content
         )
         embeddings.append(response.data[0].embedding)

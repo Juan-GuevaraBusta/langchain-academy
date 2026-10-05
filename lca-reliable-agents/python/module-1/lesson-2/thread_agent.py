@@ -1,3 +1,5 @@
+import os
+
 from openai import OpenAI
 from dotenv import load_dotenv
 from langsmith import traceable, uuid7
@@ -7,6 +9,7 @@ load_dotenv()
 
 # Initialize clients
 client = wrap_openai(OpenAI())
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-5-nano")
 
 # Configuration
 THREAD_ID = str(uuid7())
@@ -30,7 +33,7 @@ def chat_pipeline(messages: list):
 
     # Invoke the model
     chat_completion = client.chat.completions.create(
-        model="gpt-5-nano",
+        model=CHAT_MODEL,
         messages=all_messages
     )
 

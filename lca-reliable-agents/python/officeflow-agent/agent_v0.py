@@ -13,6 +13,10 @@ load_dotenv()
 # Initialize OpenAI client
 client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-5-nano")
+# Must match the model used to build knowledge_base/embeddings/embeddings.json
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+
 # Configuration
 thread_id = "default"
 
@@ -166,7 +170,7 @@ async def load_knowledge_base(kb_dir: str = "./knowledge_base") -> None:
     embeddings = []
     for chunk_name, content in chunks:
         response = await client.embeddings.create(
-            model="text-embedding-3-small",
+            model=EMBEDDING_MODEL,
             input=content
         )
         embeddings.append(response.data[0].embedding)
@@ -181,7 +185,7 @@ async def search_knowledge_base(query: str, top_k: int = 2) -> str:
 
     # Generate embedding for query
     response = await client.embeddings.create(
-        model="text-embedding-3-small",
+        model=EMBEDDING_MODEL,
         input=query
     )
     query_embedding = response.data[0].embedding
@@ -260,7 +264,7 @@ async def chat(question: str) -> str:
 
     # First API call with tools
     response = await client.chat.completions.create(
-        model="gpt-5-nano",
+        model=CHAT_MODEL,
         messages=messages,
         tools=tools,
         tool_choice="auto"
@@ -314,7 +318,7 @@ async def chat(question: str) -> str:
 
         # Make next API call with tool results
         response = await client.chat.completions.create(
-            model="gpt-5-nano",
+            model=CHAT_MODEL,
             messages=messages,
             tools=tools,
             tool_choice="auto"

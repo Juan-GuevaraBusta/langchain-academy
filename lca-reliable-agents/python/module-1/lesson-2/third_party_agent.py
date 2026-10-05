@@ -1,3 +1,5 @@
+import os
+
 from openai import OpenAI
 from langsmith.wrappers import wrap_openai
 from langsmith import traceable
@@ -6,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = wrap_openai(OpenAI())
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-5-nano")
 
 @traceable(run_type="tool")
 def weather_retriever():
@@ -33,7 +36,7 @@ def agent(question: str) -> str:
 
     # First API call with tool available
     response = client.chat.completions.create(
-        model="gpt-5-nano",
+        model=CHAT_MODEL,
         messages=messages,
         tools=[WEATHER_TOOL],
         tool_choice="auto"
@@ -75,7 +78,7 @@ def agent(question: str) -> str:
 
         # Make second API call with tool results
         response = client.chat.completions.create(
-            model="gpt-5-nano",
+            model=CHAT_MODEL,
             messages=messages,
             tools=[WEATHER_TOOL],
             tool_choice="auto"

@@ -8,6 +8,8 @@ Usage:
     uv run python eval_conciseness_pairwise.py agent-v4-3e016f9c agent-v5-7d7ee287
 """
 
+import os
+
 from dotenv import load_dotenv
 from openai import OpenAI
 from langsmith import evaluate
@@ -15,6 +17,7 @@ from langsmith import evaluate
 load_dotenv()
 
 client = OpenAI()
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gpt-5-nano")
 
 CONCISENESS_PROMPT = """You are evaluating two responses to the same customer question.
 Determine which response is MORE CONCISE while still providing all crucial information.
@@ -39,7 +42,7 @@ Output your verdict as a single number:
 
 def conciseness_evaluator(inputs: dict, outputs: list[dict]) -> list[int]:
     response = client.chat.completions.create(
-        model="gpt-5-nano",
+        model=CHAT_MODEL,
         messages=[
             {"role": "system", "content": "You are a conciseness evaluator. Respond with only a single number: 0, 1, or 2."},
             {"role": "user", "content": CONCISENESS_PROMPT.format(
